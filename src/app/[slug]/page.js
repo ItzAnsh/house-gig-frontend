@@ -10,7 +10,7 @@ import { socket } from "@/socket/socket";
 import { set } from "zod";
 
 function WorkCard({ data, joinRoom }) {
-	console.log(data);
+	// console.log(data);
 	return (
 		<div className="flex gap-12">
 			<div className="w-5/6">
@@ -114,13 +114,13 @@ export default function Page() {
 
 		socket.on("connect", onConnect);
 		socket.on("disconnect", onDisconnect);
-		socket.on("roomJoined", (data, status, gigsterId) => {
-			console.log(data, status, gigsterId);
+		socket.on("roomJoined", ({ slots, status, gigsterId }) => {
+			console.log(slots, status, gigsterId);
 			if (status === 200) {
 				console.log("Room Joined");
-				console.log(data);
+				// console.log(data);
 				setRoom(gigsterId);
-				setSlotsAvailable(data.roomId ? data.slots : []);
+				setSlotsAvailable(slots.length > 0 ? slots : []);
 			}
 		});
 
@@ -163,15 +163,27 @@ export default function Page() {
 	}, []);
 
 	useEffect(() => {
-        if (room) {
-					setTimePopup(true);
-				}
+		console.log(room);
+		if (room) {
+			setTimePopup(true);
+		} else {
+			setTimePopup(false);
+		}
 	}, [room]);
 
 	return (
 		<>
 			{timePopup && (
-				<div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] flex justify-center items-center">
+				<div
+					className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] flex justify-center items-center z-[999]"
+					id="bgPopup"
+					onClick={(e) => {
+						if (e.target.id === "bgPopup") {
+							setRoom(null);
+							// setTimePopup(false);
+						}
+					}}
+				>
 					<div className="bg-white p-8 rounded-lg">
 						<h1 className="text-2xl font-semibold">Select a time slot</h1>
 						<div className="grid grid-cols-3 gap-4 mt-4">
