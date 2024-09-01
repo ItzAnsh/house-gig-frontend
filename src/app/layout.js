@@ -4,6 +4,7 @@ import StoreProvider from "@/store/StoreProvider";
 import { NextUIProvider } from "@nextui-org/system";
 import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/common/Navbar";
+import AppProvider from "@/components/AppProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +19,11 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <NextUIProvider>
           <StoreProvider>
-            <Navbar />
-            {children}
-            <Toaster />
+            <AppProvider>
+              <Navbar />
+              {children}
+              <Toaster />
+            </AppProvider>
           </StoreProvider>
         </NextUIProvider>
       </body>

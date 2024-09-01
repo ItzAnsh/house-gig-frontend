@@ -6,5 +6,11 @@ export const GigApi = {
             signal: controller
         });
         return response;
+    },
+    details: async (gigId, controller) => {
+        const response = await public_api.get(`/gig/${gigId}`, {
+            signal: controller
+        });
+        return response;
     }
 }
