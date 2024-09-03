@@ -2,4 +2,4 @@
 
 import { io } from "socket.io-client";
 
-export const socket = io.connect("https://house-gig-socket.onrender.com");
+export const socket = io.connect("http://localhost:4000");

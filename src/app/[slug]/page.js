@@ -8,6 +8,9 @@ import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { socket } from "@/socket/socket";
 import { set } from "zod";
+// import { persistor } from "@/store/store";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 function WorkCard({ data, joinRoom }) {
 	// console.log(data);
@@ -63,6 +66,8 @@ function WorkCard({ data, joinRoom }) {
 }
 
 function Card({ image, body }) {
+	// console.log(persistor);
+
 	return (
 		<div className="flex flex-col items-center gap-2">
 			<Image
@@ -81,6 +86,54 @@ function Seperator() {
 	return <div className="border"></div>;
 }
 
+const ChooseSlotPopup = ({
+	gigsterId,
+	lockSlot,
+	leaveRoom,
+	setPopup,
+	setRoom,
+	slotsAvailable,
+	userId,
+}) => (
+	<div
+		className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] flex justify-center items-center z-[999]"
+		id="bgPopup"
+		onClick={(e) => {
+			if (e.target.id === "bgPopup") {
+				setRoom(null);
+				// setTimePopup(false);
+			}
+		}}
+	>
+		<div className="bg-white p-8 rounded-lg">
+			<h1 className="text-2xl font-semibold">Select a time slot</h1>
+			<div className="grid grid-cols-3 gap-4 mt-4">
+				{slotsAvailable.map((slot) => (
+					<>
+						{console.log(slot)}
+						<button
+							className={`border ${
+								slot.booked
+									? slot.bookedBy == userId
+										? "bg-secondary text-white"
+										: "bg-slate-500 text-white"
+									: "border-secondary text-secondary"
+							} px-4 py-2 rounded-lg `}
+							onClick={() => {
+								lockSlot(gigsterId, slot.id);
+							}}
+							disabled={slot.booked}
+						>
+							{new Date(slot.start).toLocaleTimeString()} -{" "}
+							{new Date(slot.end).toLocaleTimeString()}
+						</button>
+					</>
+				))}
+			</div>
+		</div>
+	</div>
+);
+
 export default function Page() {
 	const params = useParams();
 	const [packages, setPackages] = useState([]);
@@ -89,10 +142,16 @@ export default function Page() {
 	const [room, setRoom] = useState(null);
 	const [timePopup, setTimePopup] = useState(false);
 	const [slotsAvailable, setSlotsAvailable] = useState([]);
-
 	const [isConnected, setIsConnected] = useState(false);
 	const [transport, setTransport] = useState("N/A");
 
+	const [lockedSlots, setLockedSlots] = useState([]);
+
+	const [userId, setUserId] = useState(null);
+	const[bookedSlot, setBookedSlot] = useState("")
+
+	const selector = useSelector((state) => state.login);
+	console.log(selector);
 	useEffect(() => {
 		if (socket.connected) {
 			onConnect();
@@ -122,6 +181,40 @@ export default function Page() {
 				setRoom(gigsterId);
 				setSlotsAvailable(slots.length > 0 ? slots : []);
 			}
+		});
+		socket.on("SlotUnderProcess", (data) => {
+			toast.error(data.message);
+		});
+		socket.on("UrSlotLocked", (data) => {
+			// setLockedSlots((prev) => {
+			// 	prev.forEach((slot, index) => {
+			// 		// if (data)
+			// 		prev[index].booked = true;
+			// 	});
+			// 	return prev;
+			// });
+
+			setSlotsAvailable((prev) => {
+				// console.log(prev);
+				prev.forEach((slot, index) => {
+					if (slot.id === data.slotId) {
+						prev[index].booked = true;
+					}
+				});
+
+				// setBookedButton(true);
+				setBookedSlot(data.slotId);
+				return prev;
+			});
+
+			toast.success(data.message);
+		});
+		socket.on("SlotBooked", (data) => {
+			toast.success("Slot Booked");
+		});
+
+		socket.on("AlreadyBookedByYou", (data) => {
+			toast.error(data.message);
 		});
 
 		return () => {
@@ -157,6 +250,18 @@ export default function Page() {
 		socket.emit("joinRoom", { gigsterId: id });
 	};
 
+	const lockSlot = (gigsterId, slotId) => {
+		socket.emit("lockSlot", {
+			gigsterId: gigsterId,
+			slotId: slotId,
+			userId: selector.token,
+		});
+	};
+
+	const leaveRoom = (gigsterId) => {
+		socket.emit("leaveRoom", { gigsterId: gigsterId });
+	};
+
 	useEffect(() => {
 		fetchGigDetails();
 		fetchPackages();
@@ -174,28 +279,17 @@ export default function Page() {
 	return (
 		<>
 			{timePopup && (
-				<div
-					className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] flex justify-center items-center z-[999]"
-					id="bgPopup"
-					onClick={(e) => {
-						if (e.target.id === "bgPopup") {
-							setRoom(null);
-							// setTimePopup(false);
-						}
-					}}
-				>
-					<div className="bg-white p-8 rounded-lg">
-						<h1 className="text-2xl font-semibold">Select a time slot</h1>
-						<div className="grid grid-cols-3 gap-4 mt-4">
-							{slotsAvailable.map((slot) => (
-								<button className="border border-secondary text-secondary px-4 py-2 rounded-lg">
-									{new Date(slot.start).toLocaleTimeString()} -{" "}
-									{new Date(slot.end).toLocaleTimeString()}
-								</button>
-							))}
-						</div>
-					</div>
-				</div>
+				<ChooseSlotPopup
+					gigsterId={room}
+					lockSlot={lockSlot}
+					leaveRoom={leaveRoom}
+					setPopup={setTimePopup}
+					setRoom={setRoom}
+					slotsLocked={lockedSlots}
+					setLockedSlots={setLockedSlots}
+					slotsAvailable={slotsAvailable}
+					userId={userId}
+				/>
 			)}
 			<div className="flex justify-center px-8 py-12">
 				<div className="w-full flex gap-8 justify-between max-w-screen-xl">
@@ -249,7 +343,11 @@ export default function Page() {
 								packages.map((item, index) => {
 									return (
 										<>
-											<WorkCard data={item} joinRoom={joinRoom} />
+											<WorkCard
+												data={item}
+												joinRoom={joinRoom}
+												lockSlot={lockSlot}
+											/>
 											{index != packages.length - 1 && <Seperator />}
 										</>
 									);
