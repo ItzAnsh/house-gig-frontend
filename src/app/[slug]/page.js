@@ -102,6 +102,7 @@ const ChooseSlotPopup = ({
 			if (e.target.id === "bgPopup") {
 				setRoom(null);
 				// setTimePopup(false);
+				leaveRoom(gigsterId);
 			}
 		}}
 	>
@@ -259,7 +260,7 @@ export default function Page() {
 	};
 
 	const leaveRoom = (gigsterId) => {
-		socket.emit("leaveRoom", { gigsterId: gigsterId });
+		socket.emit("leaveRoom", { room :{id : gigsterId }});
 	};
 
 	useEffect(() => {

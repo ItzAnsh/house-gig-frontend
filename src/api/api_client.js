@@ -2,7 +2,7 @@ import { store } from "@/store/store";
 import axios from "axios";
 import _ from "lodash";
 
-const baseURL = "http://localhost:3000";
+const baseURL = "http://13.233.155.69:3000";
 export const public_api = axios.create({
     baseURL: `${baseURL}`
 })
