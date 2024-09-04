@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
 function WorkCard({ data, joinRoom }) {
-	// console.log(data);
+	console.log(data);
 	return (
 		<div className="flex gap-12">
 			<div className="w-5/6">
@@ -54,8 +54,8 @@ function WorkCard({ data, joinRoom }) {
 				<button
 					className="w-[max-content] border border-secondary text-secondary px-5 bg-white text-sm py-1.5 rounded-lg"
 					onClick={() => {
-						// console.log(data?.id);
-						joinRoom(data?.id);
+						console.log(data?.user?.id);
+						joinRoom(data?.user?.id);
 					}}
 				>
 					Book
@@ -94,6 +94,7 @@ const ChooseSlotPopup = ({
 	setRoom,
 	slotsAvailable,
 	userId,
+	showBookButton,
 }) => (
 	<div
 		className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)] flex justify-center items-center z-[999]"
@@ -124,6 +125,7 @@ const ChooseSlotPopup = ({
 								lockSlot(gigsterId, slot.id);
 							}}
 							disabled={slot.booked}
+							title={slot.booked ? "Already Booked" : "Book"}
 						>
 							{new Date(slot.start).toLocaleTimeString()} -{" "}
 							{new Date(slot.end).toLocaleTimeString()}
@@ -131,6 +133,17 @@ const ChooseSlotPopup = ({
 					</>
 				))}
 			</div>
+
+			{showBookButton && (
+				<button
+					className="border border-secondary text-secondary px-5 bg-white text-sm py-1.5 rounded-lg mt-4"
+					onClick={() => {
+						setPopup(false);
+					}}
+				>
+					Book
+				</button>
+			)}
 		</div>
 	</div>
 );
@@ -149,7 +162,7 @@ export default function Page() {
 	const [lockedSlots, setLockedSlots] = useState([]);
 
 	const [userId, setUserId] = useState(null);
-	const[bookedSlot, setBookedSlot] = useState("")
+	const [showBookButton, setShowBookButton] = useState("");
 
 	const selector = useSelector((state) => state.login);
 	console.log(selector);
@@ -202,11 +215,9 @@ export default function Page() {
 						prev[index].booked = true;
 					}
 				});
-
-				// setBookedButton(true);
-				setBookedSlot(data.slotId);
 				return prev;
 			});
+			setShowBookButton(true);
 
 			toast.success(data.message);
 		});
@@ -260,7 +271,7 @@ export default function Page() {
 	};
 
 	const leaveRoom = (gigsterId) => {
-		socket.emit("leaveRoom", { room :{id : gigsterId }});
+		socket.emit("leaveRoom", { room: { id: gigsterId } });
 	};
 
 	useEffect(() => {
@@ -290,6 +301,7 @@ export default function Page() {
 					setLockedSlots={setLockedSlots}
 					slotsAvailable={slotsAvailable}
 					userId={userId}
+					showBookButton={showBookButton}
 				/>
 			)}
 			<div className="flex justify-center px-8 py-12">

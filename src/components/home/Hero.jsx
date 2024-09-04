@@ -23,12 +23,12 @@ function Card({ image, id, body }) {
 }
 
 export default function Hero() {
-	const { gigs } = useSelector(state => state.home);
+	const { gigs } = useSelector((state) => state.home);
 
 	return (
 		<div className="max-h-[605px] h-[100vh] pt-12 flex justify-center px-8">
-			<div className="flex justify-between gap-12 w-full max-w-screen-xl">
-				<div className="w-[40%] flex flex-col gap-8">
+			<div className="flex 2xl:flex-row xl:flex-row lg:flex-row md:flex-row sm:flex-col flex-col justify-between gap-12 w-full max-w-screen-xl">
+				<div className="2xl:w-[40%] xl:w-[40%] lg:w-[40%] md;w-[40%] sm:w-[100%] w-[100%] flex flex-col gap-8">
 					<h1 className="text-4xl">Home services at your doorstep</h1>
 					<div className="border py-6 px-6 rounded-lg flex flex-col gap-6">
 						<h6 className="text-xl font-semibold text-[rgba(84,84,84,1.00)]">
