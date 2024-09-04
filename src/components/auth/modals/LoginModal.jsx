@@ -39,24 +39,49 @@ export default function LoginModal({ open, handleClose = () => { }, openRegister
         }).finally(() => setLoader(false));
     }
 
-    return open && (
-        <Fragment>
-            <div className='flex flex-col gap-4 w-[500px] z-[13] fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] p-8 bg-white rounded-md'>
-                <h4 className='text-xl font-medium '>Sign in to your platform</h4>
-                <form action={handleLogin} className='flex flex-col gap-4'>
-                    <div className='flex flex-col gap-1'>
-                        <label className='text-sm text-primary font-medium'>Your email</label>
-                        <input name='email' placeholder='xyz@gmail.com' className='text-sm px-3 py-2 outline-none border border-[rgba(84,84,84,0.3)] bg-[rgba(84,84,84,0.05)] rounded-md' />
-                    </div>
-                    <div className='flex flex-col gap-1'>
-                        <label className='text-sm text-primary font-medium'>Your password</label>
-                        <input name='password' placeholder='*********' type='password' className='text-sm px-3 py-2 outline-none border border-[rgba(84,84,84,0.3)] bg-[rgba(84,84,84,0.05)] rounded-md' />
-                    </div>
-                    <button className='bg-primary text-white rounded-md px-3 py-2 text-sm'>Login to your account</button>
-                </form>
-                <div className='text-sm'>Not registered? <button onClick={openRegister} className='text-secondary'>Create account</button></div>
-            </div>
-            <div onClick={handleClose} className='fixed bg-[rgba(0,0,0,0.3)] z-[12] top-0 left-0 w-full h-full backdrop-blur-sm'></div>
-        </Fragment>
-    )
+    return (
+			open && (
+				<Fragment>
+					<div className="flex flex-col gap-4 2xl:w-[31.35rem] xl:w-[31.35rem] lg:w-[31.35rem] md:w-[31.35rem] sm:w-[25.35rem] w-full z-[13] fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] p-8 bg-white rounded-md">
+						<h4 className="text-xl font-medium ">Sign in to your platform</h4>
+						<form action={handleLogin} className="flex flex-col gap-4">
+							<div className="flex flex-col gap-1">
+								<label className="text-sm text-primary font-medium">
+									Your email
+								</label>
+								<input
+									name="email"
+									placeholder="xyz@gmail.com"
+									className="text-sm px-3 py-2 outline-none border border-[rgba(84,84,84,0.3)] bg-[rgba(84,84,84,0.05)] rounded-md"
+								/>
+							</div>
+							<div className="flex flex-col gap-1">
+								<label className="text-sm text-primary font-medium">
+									Your password
+								</label>
+								<input
+									name="password"
+									placeholder="*********"
+									type="password"
+									className="text-sm px-3 py-2 outline-none border border-[rgba(84,84,84,0.3)] bg-[rgba(84,84,84,0.05)] rounded-md"
+								/>
+							</div>
+							<button className="bg-primary text-white rounded-md px-3 py-2 text-sm">
+								Login to your account
+							</button>
+						</form>
+						<div className="text-sm">
+							Not registered?{" "}
+							<button onClick={openRegister} className="text-secondary">
+								Create account
+							</button>
+						</div>
+					</div>
+					<div
+						onClick={handleClose}
+						className="fixed bg-[rgba(0,0,0,0.3)] z-[12] top-0 left-0 w-full h-full backdrop-blur-sm"
+					></div>
+				</Fragment>
+			)
+		);
 }
